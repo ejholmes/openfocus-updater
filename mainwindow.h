@@ -17,13 +17,14 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void Log(QString text);
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btnConnect_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_btnLocate_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_btnUpload_clicked();
 
     void closeEvent(QCloseEvent *event);
 

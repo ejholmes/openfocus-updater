@@ -19,7 +19,9 @@ FORMS    += mainwindow.ui
 
 OTHER_FILES +=
 
-CONFIG += console
+debug {
+    CONFIG += console
+}
 
 RESOURCES += \
     Resources.qrc

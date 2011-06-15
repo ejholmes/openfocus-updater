@@ -20,29 +20,32 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::Log(QString text)
+{
+    ui->listLog->addItem(text);
+    ui->listLog->count() - 1;
+}
+
+void MainWindow::on_btnConnect_clicked()
 {
     qDebug("Connecting to device");
     if (OpenFocus::Helper::ConnectBootloader()) {
         QString PageSize, FlashSize, EEPROMSize;
-        PageSize.setNum(bootloader->PageSize);
-        FlashSize.setNum(bootloader->FlashSize);
-        EEPROMSize.setNum(bootloader->EEPROMSize);
+        qDebug() << "Page Size:" << PageSize.setNum(bootloader->PageSize);
+        qDebug() << "Flash Size:" <<FlashSize.setNum(bootloader->FlashSize);
+        qDebug() << "EEPROM Size:" <<EEPROMSize.setNum(bootloader->EEPROMSize);
 
-        ui->listWidget->addItem(QString("Connected"));
-        ui->listWidget->addItem(QString("Page size: ") + PageSize);
-        ui->listWidget->addItem(QString("Flash size: ") + FlashSize);
-        ui->listWidget->addItem(QString("EEPROM size: ") + EEPROMSize);
+        Log(QString("Connected"));
 
-        ui->pushButton->setDisabled(true);
-        ui->pushButton_2->setEnabled(true);
+        ui->btnConnect->setDisabled(true);
+        ui->btnLocate->setEnabled(true);
     }
     else {
-        ui->listWidget->addItem(QString("Device not found"));
+        Log(QString("Device not found"));
     }
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_btnLocate_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, QString("Open firmware update"), QString(""), QString("Firmware Update Files (*.hex);;All files (*.*)"));
 
@@ -52,36 +55,49 @@ void MainWindow::on_pushButton_2_clicked()
         flashdata = IntelHexFile::RecordsToFlashData(records);
 
         IntelHexFile::FreeRecords(records);
+        QString filesize;
+        filesize.setNum(flashdata->size);
+
+        Log(QString("Ready to upload ") + filesize + QString(" bytes of data"));
+
         fclose(fp);
 
-        ui->pushButton_3->setEnabled(true);
+        ui->btnUpload->setEnabled(true);
     }
-
-    qDebug() << filename;
 }
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_btnUpload_clicked()
 {
     if (flashdata != NULL) {
-        if (!bootloader->WriteFlash(flashdata->data, flashdata->size)) {
-            qDebug() << "An error occured while trying to write flash data";
-            return;
+        unsigned char *data = flashdata->data;
+        int length = flashdata->size;
+
+        for (unsigned short address = 0; address < length; address += OpenFocus::Bootloader::PageSize) {
+            Log(QString("Writing block ") + QString().setNum(address, 16) + QString(" ... ") + QString().setNum(address + OpenFocus::Bootloader::PageSize, 16));
+            if (bootloader->WriteFlashBlock(address, data, OpenFocus::Bootloader::PageSize) <= 0)
+            {
+                Log(QString("An error occurred while writing data"));
+                return;
+            }
+            data += OpenFocus::Bootloader::PageSize;
         }
 
         bootloader->Reboot();
 
-        ui->pushButton->setDisabled(true);
-        ui->pushButton_2->setDisabled(true);
-        ui->pushButton_3->setDisabled(true);
+        ui->btnConnect->setDisabled(true);
+        ui->btnLocate->setDisabled(true);
+        ui->btnUpload->setDisabled(true);
     }
     else {
-        qDebug() << "An error occured";
+        qDebug() << "An error occurred";
     }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //bootloader->Reboot();
-    bootloader->Disconnect();
+    if (bootloader->IsConnected()) {
+        bootloader->Reboot();
+        bootloader->Disconnect();
+    }
     event->accept();
 }

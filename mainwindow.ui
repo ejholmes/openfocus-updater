@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>228</height>
+    <height>250</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>440</width>
+    <height>250</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Firmware Updater</string>
@@ -21,7 +27,7 @@
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="gbStep1">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -33,7 +39,7 @@
     <property name="title">
      <string>Step 1</string>
     </property>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="btnConnect">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -47,7 +53,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="gbStep2">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -59,7 +65,7 @@
     <property name="title">
      <string>Step 2</string>
     </property>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="btnLocate">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -76,7 +82,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_3">
+   <widget class="QGroupBox" name="gbStep3">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -88,7 +94,7 @@
     <property name="title">
      <string>Step 3</string>
     </property>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="btnUpload">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -105,14 +111,20 @@
      </property>
     </widget>
    </widget>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="listLog">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>70</y>
       <width>421</width>
-      <height>151</height>
+      <height>171</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+      <pointsize>10</pointsize>
+     </font>
     </property>
    </widget>
   </widget>
