@@ -1,0 +1,3 @@
+[submodule "LibOpenFocus"]
+	path = LibOpenFocus
+	url = git@github.com:CortexAstronomy/LibOpenFocus.git
