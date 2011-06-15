@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-TARGET = App
+TARGET = Updater
 TEMPLATE = app
 
 
@@ -19,9 +19,11 @@ FORMS    += mainwindow.ui
 
 OTHER_FILES +=
 
-LIBS += -L../lib -lusb
-
 CONFIG += console
 
 RESOURCES += \
     Resources.qrc
+
+INCLUDEPATH += 'LibOpenFocus'
+
+win32:LIBS += -L'../App/LibOpenFocus-build-desktop/debug' -L'../App/LibOpenFocus/libusb' -lopenfocus -lusb

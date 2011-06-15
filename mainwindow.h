@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 
-#include "OpenFocus.h"
+#include "openfocus.h"
+#include "intelhex.h"
 
 namespace Ui {
     class MainWindow;
@@ -28,8 +29,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    OpenFocus::Device *device;
     OpenFocus::Bootloader *bootloader;
+    flash *flashdata;
 };
 
 #endif // MAINWINDOW_H
