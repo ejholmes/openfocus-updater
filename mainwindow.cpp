@@ -1,6 +1,11 @@
 #include <QtGui>
 #include <stdio.h>
 
+#ifdef __WIN32__
+#include <windows.h>
+#include <time.h>
+#endif
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "openfocus.h"
@@ -13,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     bootloader = new OpenFocus::Bootloader();
     flashdata = NULL;
+    connect = false;
 }
 
 MainWindow::~MainWindow()
@@ -23,13 +29,32 @@ MainWindow::~MainWindow()
 void MainWindow::Log(QString text)
 {
     ui->listLog->addItem(text);
-    ui->listLog->count() - 1;
+    ui->listLog->scrollToBottom();
 }
 
 void MainWindow::on_btnConnect_clicked()
 {
     qDebug("Connecting to device");
-    if (OpenFocus::Helper::ConnectBootloader()) {
+#ifdef __WIN32__
+    connect = true;
+    OpenFocus::Helper::ConnectBootloader(false);
+
+    time_t t = time(NULL) + 2;
+
+    while (connect) {
+        if (time(NULL) >= t)
+            goto notconnected; /* Timed out */
+        QApplication::processEvents();
+    }
+    goto connected;
+#else
+    if (OpenFocus::Helper::ConnectBootloader())
+        goto connected;
+    else
+        goto notconnected;
+#endif
+connected:
+    {
         QString PageSize, FlashSize, EEPROMSize;
         qDebug() << "Page Size:" << PageSize.setNum(bootloader->PageSize);
         qDebug() << "Flash Size:" <<FlashSize.setNum(bootloader->FlashSize);
@@ -39,10 +64,11 @@ void MainWindow::on_btnConnect_clicked()
 
         ui->btnConnect->setDisabled(true);
         ui->btnLocate->setEnabled(true);
+        return;
     }
-    else {
-        Log(QString("Device not found"));
-    }
+notconnected:
+    Log(QString("Device not found"));
+    return;
 }
 
 void MainWindow::on_btnLocate_clicked()
@@ -101,3 +127,19 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     event->accept();
 }
+
+#ifdef __WIN32__
+bool MainWindow::winEvent(MSG *message, long *result)
+{
+    const unsigned int DBT_DEVNODES_CHANGED = 0x0007;
+    if (message->message == WM_DEVICECHANGE && message->wParam == DBT_DEVNODES_CHANGED) {
+        if (bootloader->IsConnected())
+            connect = false;
+
+        if (connect && bootloader->Connect())
+            connect = false;
+    }
+
+    return false;
+}
+#endif

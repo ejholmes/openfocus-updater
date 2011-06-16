@@ -28,10 +28,15 @@ private slots:
 
     void closeEvent(QCloseEvent *event);
 
+#ifdef __WIN32__
+    bool winEvent(MSG *message, long *result);
+#endif
+
 private:
     Ui::MainWindow *ui;
     OpenFocus::Bootloader *bootloader;
     flash *flashdata;
+    bool connect;
 };
 
 #endif // MAINWINDOW_H

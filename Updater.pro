@@ -28,4 +28,4 @@ RESOURCES += \
 
 INCLUDEPATH += 'LibOpenFocus'
 
-win32:LIBS += -L'../App/LibOpenFocus-build-desktop/debug' -L'../App/LibOpenFocus/libusb' -lopenfocus -lusb
+win32:LIBS += -L'../OpenFocusUpdater/LibOpenFocus-build-desktop/debug' -L'../OpenFocusUpdater/LibOpenFocus/libusb' -lopenfocus -lusb
