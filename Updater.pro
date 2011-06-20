@@ -17,7 +17,8 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
-OTHER_FILES +=
+OTHER_FILES += \
+    Win32.rc
 
 debug {
     CONFIG += console
@@ -29,3 +30,4 @@ RESOURCES += \
 INCLUDEPATH += 'LibOpenFocus'
 
 win32:LIBS += -L'../OpenFocusUpdater/LibOpenFocus-build-desktop/debug' -L'../OpenFocusUpdater/LibOpenFocus/libusb' -lopenfocus -lusb
+win32:RC_FILE += Win32.rc
