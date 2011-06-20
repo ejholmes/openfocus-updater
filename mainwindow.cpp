@@ -35,14 +35,15 @@ void MainWindow::Log(QString text)
 void MainWindow::on_btnConnect_clicked()
 {
     qDebug("Connecting to device");
+/* If we're on windows, use system events to detect when the device is connected */
 #ifdef __WIN32__
     connect = true;
     OpenFocus::Helper::ConnectBootloader(false);
 
-    time_t t = time(NULL) + 2;
+    time_t timeout = time(NULL) + 2;
 
     while (connect) {
-        if (time(NULL) >= t)
+        if (time(NULL) >= timeout)
             goto notconnected; /* Timed out */
         QApplication::processEvents();
     }
@@ -55,11 +56,6 @@ void MainWindow::on_btnConnect_clicked()
 #endif
 connected:
     {
-        QString PageSize, FlashSize, EEPROMSize;
-        qDebug() << "Page Size:" << PageSize.setNum(bootloader->PageSize);
-        qDebug() << "Flash Size:" << FlashSize.setNum(bootloader->FlashSize);
-        qDebug() << "EEPROM Size:" << EEPROMSize.setNum(bootloader->EEPROMSize);
-
         Log(QString("Connected"));
 
         ui->btnConnect->setDisabled(true);
@@ -75,6 +71,7 @@ void MainWindow::on_btnLocate_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, QString("Open firmware update"), QString(""), QString("Firmware Update Files (*.hex);;All files (*.*)"));
 
+    /* Open the file and parse all the data */
     if (filename != "") {
         FILE *fp = fopen(filename.toLocal8Bit().constData(), "r");
         record *records = IntelHexFile::Open(fp);
@@ -98,17 +95,19 @@ void MainWindow::on_btnUpload_clicked()
         unsigned char *data = flashdata->data;
         int length = flashdata->size;
 
-        for (unsigned short address = 0; address < length; address += bootloader->PageSize) {
-            Log(QString("Writing block ") + QString().setNum(address, 16) + QString(" ... ") + QString().setNum(address + bootloader->PageSize, 16));
-            if (bootloader->WriteFlashBlock(address, data, bootloader->PageSize) <= 0)
+        for (unsigned short address = 0; address < length; address += OpenFocus::Bootloader::PageSize) {
+            Log(QString("Writing block ") + QString().setNum(address, 16) + QString(" ... ") + QString().setNum(address + OpenFocus::Bootloader::PageSize, 16));
+            QApplication::processEvents();
+            if (bootloader->WriteFlashBlock(address, data, OpenFocus::Bootloader::PageSize) <= 0)
             {
                 Log(QString("An error occurred while writing data"));
                 return;
             }
-            data += bootloader->PageSize;
+            data += OpenFocus::Bootloader::PageSize;
         }
-
+        Log("Rebooting device");
         bootloader->Reboot();
+        Log("Firmware update complete");
 
         ui->btnConnect->setDisabled(true);
         ui->btnLocate->setDisabled(true);
@@ -122,6 +121,7 @@ void MainWindow::on_btnUpload_clicked()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (bootloader->IsConnected()) {
+        Log(QString("No data uploaded...rebooting device"));
         bootloader->Reboot();
         bootloader->Disconnect();
     }
