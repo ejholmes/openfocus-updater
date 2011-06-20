@@ -29,5 +29,8 @@ RESOURCES += \
 
 INCLUDEPATH += 'LibOpenFocus'
 
-win32:LIBS += -L'../OpenFocusUpdater/LibOpenFocus-build-desktop/debug' -L'../OpenFocusUpdater/LibOpenFocus/libusb' -lopenfocus -lusb
+LIBS += -lopenfocus -lusb
+win32:LIBS += '-L../OpenFocusUpdater/LibOpenFocus-build-desktop/debug' '-L../OpenFocusUpdater/LibOpenFocus/libusb'
+macx|unix:LIBS += '-L../OpenFocusUpdater/LibOpenFocus-build-desktop'
+unix:LIBS += $$system(libusb-config --libs)
 win32:RC_FILE += Win32.rc
