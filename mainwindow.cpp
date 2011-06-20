@@ -57,8 +57,8 @@ connected:
     {
         QString PageSize, FlashSize, EEPROMSize;
         qDebug() << "Page Size:" << PageSize.setNum(bootloader->PageSize);
-        qDebug() << "Flash Size:" <<FlashSize.setNum(bootloader->FlashSize);
-        qDebug() << "EEPROM Size:" <<EEPROMSize.setNum(bootloader->EEPROMSize);
+        qDebug() << "Flash Size:" << FlashSize.setNum(bootloader->FlashSize);
+        qDebug() << "EEPROM Size:" << EEPROMSize.setNum(bootloader->EEPROMSize);
 
         Log(QString("Connected"));
 
@@ -98,14 +98,14 @@ void MainWindow::on_btnUpload_clicked()
         unsigned char *data = flashdata->data;
         int length = flashdata->size;
 
-        for (unsigned short address = 0; address < length; address += OpenFocus::Bootloader::PageSize) {
-            Log(QString("Writing block ") + QString().setNum(address, 16) + QString(" ... ") + QString().setNum(address + OpenFocus::Bootloader::PageSize, 16));
-            if (bootloader->WriteFlashBlock(address, data, OpenFocus::Bootloader::PageSize) <= 0)
+        for (unsigned short address = 0; address < length; address += bootloader->PageSize) {
+            Log(QString("Writing block ") + QString().setNum(address, 16) + QString(" ... ") + QString().setNum(address + bootloader->PageSize, 16));
+            if (bootloader->WriteFlashBlock(address, data, bootloader->PageSize) <= 0)
             {
                 Log(QString("An error occurred while writing data"));
                 return;
             }
-            data += OpenFocus::Bootloader::PageSize;
+            data += bootloader->PageSize;
         }
 
         bootloader->Reboot();
