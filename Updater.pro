@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-TARGET = Updater
+TARGET = updater
 TEMPLATE = app
 
 
