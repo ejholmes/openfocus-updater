@@ -76,7 +76,7 @@ void MainWindow::on_btnLocate_clicked()
     /* Open the file and parse all the data */
     if (filename != "") {
         FILE *fp = fopen(filename.toLocal8Bit().constData(), "r");
-        record *records = IntelHexFile::Open(fp);
+        struct record *records = IntelHexFile::Open(fp);
         flashdata = IntelHexFile::RecordsToFlashData(records);
 
         IntelHexFile::FreeRecords(records);

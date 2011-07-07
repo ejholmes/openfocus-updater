@@ -35,7 +35,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     OpenFocus::Bootloader *bootloader;
-    flash *flashdata;
+    struct flash *flashdata;
     bool connect;
 };
 
