@@ -46,6 +46,8 @@ void MainWindow::on_btnConnect_clicked()
         if (time(NULL) >= timeout)
             goto notconnected; /* Timed out */
         QApplication::processEvents();
+        if (bootloader->IsConnected())
+            connect = false;
     }
     goto connected;
 #else
@@ -133,9 +135,6 @@ bool MainWindow::winEvent(MSG *message, long *result)
 {
     const unsigned int DBT_DEVNODES_CHANGED = 0x0007;
     if (message->message == WM_DEVICECHANGE && message->wParam == DBT_DEVNODES_CHANGED) {
-        if (bootloader->IsConnected())
-            connect = false;
-
         if (connect && bootloader->Connect())
             connect = false;
     }
